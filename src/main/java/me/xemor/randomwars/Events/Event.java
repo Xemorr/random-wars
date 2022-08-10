@@ -13,7 +13,7 @@ public abstract class Event {
       this.name = name;
       this.icon = icon;
    }
-   abstract void start(World world, RandomWars randomWars);
+   public abstract void start(World world, RandomWars randomWars);
 
    public String getName() {
       return name;

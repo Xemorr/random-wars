@@ -1,0 +1,4 @@
+name: Randomitemevery30
+version: 1.0-SNAPSHOT
+main: me.xemor.randomwars.RandomWars
+api-version: 1.13

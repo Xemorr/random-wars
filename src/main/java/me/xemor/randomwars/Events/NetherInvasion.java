@@ -9,18 +9,12 @@ import org.bukkit.entity.Blaze;
 import org.bukkit.entity.Ghast;
 import org.bukkit.inventory.ItemStack;
 
-public class NetherInvasion implements Event {
+public class NetherInvasion extends Event {
    private int amount;
-   private String name;
-   private ItemStack icon;
 
-   public NetherInvasion(String name, Material icon, int amount) {
+   public NetherInvasion(String name, ItemStack icon, int amount) {
+      super(name, icon);
       this.amount = amount;
-      if (icon != null) {
-         this.icon = new ItemStack(icon);
-      }
-
-      this.name = name;
    }
 
    public void start(World world, me.xemor.randomwars.RandomWars randomWars) {
@@ -40,16 +34,8 @@ public class NetherInvasion implements Event {
       }
 
    }
-
-   public String getName() {
-      return this.name;
-   }
-
    public boolean playBossMusic() {
       return true;
    }
 
-   public ItemStack getIcon() {
-      return this.icon;
-   }
 }

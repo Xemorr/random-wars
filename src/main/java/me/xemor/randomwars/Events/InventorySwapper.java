@@ -10,16 +10,12 @@ import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-public class InventorySwapper implements Event {
+public class InventorySwapper extends Event {
    private String name;
    private ItemStack icon;
 
-   public InventorySwapper(String name, Material icon) {
-      this.name = name;
-      if (icon != null) {
-         this.icon = new ItemStack(icon);
-      }
-
+   public InventorySwapper(String name, ItemStack icon) {
+      super(name, icon);
    }
 
    public void start(World world, me.xemor.randomwars.RandomWars randomWars) {

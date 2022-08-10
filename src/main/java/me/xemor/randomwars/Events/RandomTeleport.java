@@ -11,16 +11,10 @@ import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-public class RandomTeleport implements Event {
-   private String name;
-   private ItemStack icon;
+public class RandomTeleport extends Event {
 
-   public RandomTeleport(String name, Material icon) {
-      this.name = name;
-      if (icon != null) {
-         this.icon = new ItemStack(icon);
-      }
-
+   public RandomTeleport(String name, ItemStack icon) {
+      super(name, icon);
    }
 
    public void start(World world, me.xemor.randomwars.RandomWars randomWars) {
@@ -37,16 +31,7 @@ public class RandomTeleport implements Event {
       }
 
    }
-
-   public String getName() {
-      return this.name;
-   }
-
    public boolean playBossMusic() {
       return false;
-   }
-
-   public ItemStack getIcon() {
-      return this.icon;
    }
 }

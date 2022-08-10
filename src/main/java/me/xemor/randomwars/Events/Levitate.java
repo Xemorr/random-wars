@@ -11,20 +11,14 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
-public class Levitate implements Event {
+public class Levitate extends Event {
    private int duration;
    private int amplifier;
-   private ItemStack icon;
-   private String name;
 
-   public Levitate(String name, Material icon, int duration, int amplifier) {
+   public Levitate(String name, ItemStack icon, int duration, int amplifier) {
+      super(name, icon);
       this.duration = duration;
       this.amplifier = amplifier;
-      this.name = name;
-      if (icon != null) {
-         this.icon = new ItemStack(icon);
-      }
-
    }
 
    public void start(World world, me.xemor.randomwars.RandomWars randomWars) {
@@ -46,7 +40,4 @@ public class Levitate implements Event {
       return false;
    }
 
-   public ItemStack getIcon() {
-      return this.icon;
-   }
 }

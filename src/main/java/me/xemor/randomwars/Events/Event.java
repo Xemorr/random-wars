@@ -1,14 +1,25 @@
 package me.xemor.randomwars.Events;
 
+import me.xemor.randomwars.RandomWars;
 import org.bukkit.World;
 import org.bukkit.inventory.ItemStack;
 
-public interface Event {
-   void start(World var1, me.xemor.randomwars.RandomWars var2);
+public abstract class Event {
 
-   String getName();
+   private final String name;
+   private final ItemStack icon;
 
-   boolean playBossMusic();
+   public Event(String name, ItemStack icon) {
+      this.name = name;
+      this.icon = icon;
+   }
+   abstract void start(World world, RandomWars randomWars);
 
-   ItemStack getIcon();
+   public String getName() {
+      return name;
+   };
+   abstract boolean playBossMusic();
+   public ItemStack getIcon() {
+      return icon;
+   };
 }

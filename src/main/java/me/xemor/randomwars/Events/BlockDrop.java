@@ -12,14 +12,15 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
-public class BlockDrop implements Event {
+public class BlockDrop extends Event {
    private int numberOfBlocks;
    private Material blockToDrop;
    private String name;
    private boolean hurtsEntities = false;
    private ItemStack icon;
 
-   public BlockDrop(String name, Material blockToDrop, int numberOfBlocks, boolean hurtsEntities) {
+   public BlockDrop(String name, ItemStack icon, Material blockToDrop, int numberOfBlocks, boolean hurtsEntities) {
+      super(name, icon);
       this.numberOfBlocks = numberOfBlocks;
       this.blockToDrop = blockToDrop;
       this.name = name;
@@ -30,21 +31,15 @@ public class BlockDrop implements Event {
 
    }
 
-   public BlockDrop(String name, Material blockToDrop, int numberOfBlocks) {
-      this.numberOfBlocks = numberOfBlocks;
-      this.blockToDrop = blockToDrop;
-      this.name = name;
-      this.icon = new ItemStack(blockToDrop);
+   public BlockDrop(String name, ItemStack icon, Material blockToDrop, int numberOfBlocks) {
+      this(name, icon, blockToDrop, numberOfBlocks, false);
    }
 
    public void start(World world, me.xemor.randomwars.RandomWars randomWars) {
-      Iterator var3 = randomWars.getAlivePlayers().iterator();
-
-      while(var3.hasNext()) {
-         UUID uuid = (UUID)var3.next();
+      for (UUID uuid : randomWars.getAlivePlayers()) {
          final Player player = Bukkit.getPlayer(uuid);
 
-         for(int i = 0; i < this.numberOfBlocks; ++i) {
+         for (int i = 0; i < this.numberOfBlocks; ++i) {
             (new BukkitRunnable() {
                public void run() {
                   Location location = player.getLocation();
@@ -52,7 +47,7 @@ public class BlockDrop implements Event {
                   FallingBlock fallingBlock = player.getWorld().spawnFallingBlock(location, BlockDrop.this.blockToDrop.createBlockData());
                   fallingBlock.setHurtEntities(BlockDrop.this.hurtsEntities);
                }
-            }).runTaskLater(randomWars, (long)(10 * i));
+            }).runTaskLater(randomWars, (long) (10 * i));
          }
       }
 

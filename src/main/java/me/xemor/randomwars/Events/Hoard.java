@@ -10,18 +10,15 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-public class Hoard implements Event {
+public class Hoard extends Event {
    private int amount;
    private EntityType entity;
    private ItemStack icon;
 
-   public Hoard(EntityType entity, int amount, Material icon) {
+   public Hoard(String name, ItemStack icon, EntityType entity, int amount) {
+      super(name, icon);
       this.amount = amount;
       this.entity = entity;
-      if (icon != null) {
-         this.icon = new ItemStack(icon);
-      }
-
    }
 
    public void start(World world, me.xemor.randomwars.RandomWars randomWars) {

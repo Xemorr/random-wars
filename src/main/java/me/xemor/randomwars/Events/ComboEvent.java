@@ -4,18 +4,14 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.inventory.ItemStack;
 
-public class ComboEvent implements Event {
+public class ComboEvent extends Event {
    private Event[] events;
    private String name;
    private ItemStack icon;
 
-   public ComboEvent(String name, Material icon, Event... events) {
+   public ComboEvent(String name, ItemStack icon, Event... events) {
+      super(name, icon);
       this.events = events;
-      this.name = name;
-      if (icon != null) {
-         this.icon = new ItemStack(icon);
-      }
-
    }
 
    public void start(World world, me.xemor.randomwars.RandomWars randomWars) {

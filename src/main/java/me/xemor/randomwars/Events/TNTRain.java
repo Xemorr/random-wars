@@ -6,18 +6,14 @@ import org.bukkit.World;
 import org.bukkit.entity.TNTPrimed;
 import org.bukkit.inventory.ItemStack;
 
-public class TNTRain implements Event {
+public class TNTRain extends Event {
    private int multiplier;
    private ItemStack icon;
    private String name;
 
-   public TNTRain(String name, Material icon, int multiplier) {
+   public TNTRain(String name, ItemStack icon, int multiplier) {
+      super(name, icon);
       this.multiplier = multiplier;
-      this.name = name;
-      if (icon != null) {
-         this.icon = new ItemStack(icon);
-      }
-
    }
 
    public void start(World world, me.xemor.randomwars.RandomWars randomWars) {

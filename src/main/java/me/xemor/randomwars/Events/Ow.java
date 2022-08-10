@@ -11,16 +11,11 @@ import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-public class Ow implements Event {
+public class Ow extends Event {
    private ItemStack icon;
-   private String name;
 
-   public Ow(String name, Material icon) {
-      this.name = name;
-      if (icon != null) {
-         this.icon = new ItemStack(icon);
-      }
-
+   public Ow(String name, ItemStack icon) {
+      super(name, icon);
    }
 
    public void start(World world, me.xemor.randomwars.RandomWars randomWars) {
@@ -32,15 +27,7 @@ public class Ow implements Event {
       }
    }
 
-   public String getName() {
-      return this.name;
-   }
-
    public boolean playBossMusic() {
       return false;
-   }
-
-   public ItemStack getIcon() {
-      return this.icon;
    }
 }

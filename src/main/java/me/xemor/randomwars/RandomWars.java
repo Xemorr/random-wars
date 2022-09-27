@@ -5,35 +5,42 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.UUID;
 
+import me.xemor.randomwars.Commands.VoteCommand;
 import me.xemor.randomwars.Events.*;
 import me.xemor.randomwars.Features.Fireball;
 import me.xemor.randomwars.Features.RandomPortal;
-import me.xemor.randomwars.Spectator.TeleportCompass;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.command.Command;
+import org.bukkit.command.PluginCommand;
 import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public final class RandomWars extends JavaPlugin {
+
+   private static RandomWars randomWars;
    private Islands islands;
    private Supply supply;
-   private List<UUID> alivePlayers = new ArrayList();
-   private HashSet<UUID> startingPlayers = new HashSet();
+   private List<UUID> alivePlayers = new ArrayList<>();
+   private HashSet<UUID> startingPlayers = new HashSet<>();
    private EventHandler eventHandler;
-   private HashSet<UUID> deadPlayers = new HashSet();
+   private HashSet<UUID> deadPlayers = new HashSet<>();
 
    public void onEnable() {
+      randomWars = this;
       this.supply = new Supply(this);
       this.islands = new Islands(this);
       RandomPortal randomPortal = new RandomPortal(this);
       Fireball fireball = new Fireball();
-      TeleportCompass teleportCompass = new TeleportCompass(this);
       Bukkit.getPluginManager().registerEvents(this.islands, this);
-      Bukkit.getPluginManager().registerEvents(teleportCompass, this);
       Bukkit.getPluginManager().registerEvents(this.supply, this);
       Bukkit.getPluginManager().registerEvents(randomPortal, this);
       Bukkit.getPluginManager().registerEvents(fireball, this);
+      VoteCommand voteCommand = new VoteCommand();
+      PluginCommand command = this.getCommand("vote");
+      command.setExecutor(voteCommand);
+      command.setTabCompleter(voteCommand);
       Event[] events = new Event[]{
               new BlockDrop("Anvils!", new ItemStack(Material.ANVIL), Material.ANVIL, 4, true),
               new ComboEvent("Levitate and Phantoms", new ItemStack(Material.BEETROOT_SEEDS), new PhantomAttack("", null, 25), new Levitate("", null, 200, 1)),
@@ -54,14 +61,10 @@ public final class RandomWars extends JavaPlugin {
               new ComboEvent("All the Mobs", new ItemStack(Material.SKELETON_SKULL), new Hoard("", null, EntityType.SKELETON, 2), new Hoard("", null, EntityType.CAVE_SPIDER, 2), new Hoard("", null, EntityType.ZOMBIE, 1)),
               new Hoard("Vindicator Hoard", new ItemStack(Material.VINDICATOR_SPAWN_EGG), EntityType.VINDICATOR, 2),
               new Ow("Ow!", new ItemStack(Material.DIAMOND_SWORD)),
+              new GiveItemEvent("Elytra Madness", new ItemStack(Material.ELYTRA), new ItemStack(Material.ELYTRA), new ItemStack(Material.FIREWORK_ROCKET, 10)),
               new ComboEvent("Encherf Or Nuffin", new ItemStack(Material.ENCHANTING_TABLE), new ClearInventoryEvent("", null, 0.5), new EnchantEvent("", null)),
-              new ComboEvent("Encherf Or Nuffin", new ItemStack(Material.ENCHANTING_TABLE), new ClearInventoryEvent("", null, 0.5), new EnchantEvent("", null))};
-      this.eventHandler = new EventHandler();
-      int length = events.length;
-      for(int i = 0; i < length; ++i) {
-         Event event = events[i];
-         this.eventHandler.addEvent(event);
-      }
+              new Hoard("Creeper!", new ItemStack(Material.CREEPER_HEAD), EntityType.CREEPER, 1)};
+      eventHandler = new EventHandler(events);
    }
 
    public Islands getIslands() {
@@ -86,6 +89,10 @@ public final class RandomWars extends JavaPlugin {
 
    public HashSet<UUID> getDeadPlayers() {
       return this.deadPlayers;
+   }
+
+   public static RandomWars getRandomWars() {
+      return randomWars;
    }
 
    public void onDisable() {

@@ -17,13 +17,13 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
 public class Supply implements Listener {
-   final Material[] bannedMaterials;
-   final String[] bannedStrings;
-   String actionbar20sMessage;
-   String actionbarSneakMessage;
-   List<ItemStack> items;
-   RandomWars randomBlock;
-   Random random;
+   private final Material[] bannedMaterials;
+   private final String[] bannedStrings;
+   private final String actionbar20sMessage;
+   private final String actionbarSneakMessage;
+   private final List<ItemStack> items;
+   private final RandomWars randomBlock;
+   private final Random random;
 
    public Supply(RandomWars pl) {
       this.bannedMaterials = new Material[]{Material.FIRE, Material.REDSTONE_WALL_TORCH, Material.JIGSAW, Material.STRUCTURE_BLOCK, Material.STRUCTURE_VOID, Material.COMMAND_BLOCK, Material.CHAIN_COMMAND_BLOCK, Material.REPEATING_COMMAND_BLOCK, Material.WALL_TORCH, Material.END_GATEWAY, Material.BEETROOTS, Material.POTATOES, Material.COCOA, Material.MOVING_PISTON, Material.PISTON_HEAD, Material.CARROTS, Material.END_PORTAL, Material.WATER, Material.ATTACHED_MELON_STEM, Material.ATTACHED_PUMPKIN_STEM, Material.LAVA, Material.NETHER_PORTAL, Material.REDSTONE_WIRE, Material.AIR, Material.CAVE_AIR, Material.VOID_AIR};
@@ -33,7 +33,7 @@ public class Supply implements Listener {
       this.random = new Random();
       this.randomBlock = pl;
       Material[] material = Material.values();
-      this.items = new ArrayList();
+      this.items = new ArrayList<>();
 
       for(int i = 0; i < material.length; ++i) {
          if (!this.isBanned(material[i])) {
@@ -48,8 +48,8 @@ public class Supply implements Listener {
             for (Player player : Bukkit.getOnlinePlayers()) {
                if (player.getGameMode().equals(GameMode.SURVIVAL)) {
                   Inventory inventory = player.getInventory();
-                  inventory.addItem(new ItemStack[]{Supply.this.getRandomItem()});
-                  player.sendActionBar(Supply.this.actionbar20sMessage);
+                  inventory.addItem(getRandomItem());
+                  player.sendActionBar(actionbar20sMessage);
                }
             }
 
@@ -103,7 +103,7 @@ public class Supply implements Listener {
    public ItemStack getRandomItem() {
       Random random = new Random();
       ItemStack item = this.items.get(random.nextInt(this.items.size())).clone();
-      item.setAmount(item.getAmount() * random.nextInt(5) + 1);
+      item.setAmount(Math.min(item.getAmount() * random.nextInt(5) + 1, item.getMaxStackSize()));
       return item;
    }
 

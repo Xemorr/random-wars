@@ -33,15 +33,7 @@ public class InventorySwapper extends Event {
 
    }
 
-   public String getName() {
-      return "Inventory Swapping";
-   }
-
    public boolean playBossMusic() {
       return false;
-   }
-
-   public ItemStack getIcon() {
-      return this.icon;
    }
 }

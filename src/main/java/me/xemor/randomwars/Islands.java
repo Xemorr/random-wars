@@ -9,7 +9,6 @@ import java.util.Random;
 import java.util.UUID;
 import me.xemor.randomwars.Events.Event;
 import me.xemor.randomwars.PluginEvents.GameEndEvent;
-import me.xemor.randomwars.Spectator.SpectatorPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
@@ -39,13 +38,13 @@ public class Islands implements Listener {
    private String playersRemainingSubtitle;
    private String GG;
    private String GGSubtitle;
-   private Random random;
+   private final Random random;
    int currentEventNumber;
    String currentMessage;
    RandomWars randomBlock;
 
    public Islands(RandomWars randomBlock) {
-      this.bossBar = Bukkit.createBossBar("Grace Period.", BarColor.BLUE, BarStyle.SOLID, new BarFlag[0]);
+      this.bossBar = Bukkit.createBossBar("Grace Period.", BarColor.BLUE, BarStyle.SOLID);
       this.gracePeriod = true;
       this.gracePeriodOver = ChatColor.translateAlternateColorCodes('&', "&5&lGRACE PERIOD OVER!");
       this.playersRemainingSubtitle = ChatColor.translateAlternateColorCodes('&', "&7&l%s players remaining!");
@@ -68,33 +67,37 @@ public class Islands implements Listener {
    public void startGameTimer() {
       this.gameTimer = (new BukkitRunnable() {
          public void run() {
-            Long currentTime = System.currentTimeMillis();
+            randomBlock.getEventHandler().reset();
+            long currentTime = System.currentTimeMillis();
             Islands.this.bossBar.setTitle(String.format(Islands.this.currentMessage, Islands.this.randomBlock.getAlivePlayers().size()));
             if (startMillis + minute * 3L <= currentTime && Islands.this.gracePeriod) {
-               Islands.this.gracePeriod = false;
-               Islands.this.currentMessage = "Grace Period is over! %s players are alive!";
-               Islands.this.bossBar.setColor(BarColor.PURPLE);
+               gracePeriod = false;
+               currentMessage = "Grace Period is over! %s players are alive!";
+               bossBar.setColor(BarColor.PURPLE);
                Islands.this.sendTitleToAll(new Title(gracePeriodOver, String.format(Islands.this.playersRemainingSubtitle, Islands.this.randomBlock.getAlivePlayers().size())));
             }
-
-            if (startMillis + minute * 3L + minute * currentEventNumber <= currentTime) {
+            else if (startMillis + minute * 3L > currentTime) {
+               bossBar.setProgress((currentTime - startMillis) / (double) (minute * 3));
+            }
+            else if (startMillis + minute * 3L + minute * currentEventNumber <= currentTime) {
                currentEventNumber++;
                Event event = randomBlock.getEventHandler().decideEvent();
                event.start(world.getBukkitWorld(), randomBlock);
+               randomBlock.getEventHandler().reset();
                Islands.this.bossBar.setColor(BarColor.RED);
                Islands.this.currentMessage = event.getName() + " %s players are alive!";
                Islands.this.sendTitleToAll(new Title(ChatColor.DARK_PURPLE + "" + ChatColor.BOLD + event.getName(), String.format(Islands.this.playersRemainingSubtitle, Islands.this.randomBlock.getAlivePlayers().size())));
             }
-
+            else {
+               bossBar.setProgress((currentTime - (startMillis + minute * 3L + minute * (currentEventNumber - 1))) / (double) minute);
+            }
          }
       }).runTaskTimer(this.randomBlock, 20L, 20L);
    }
 
    public void sendTitleToAll(Title title) {
-      Iterator var2 = Bukkit.getOnlinePlayers().iterator();
 
-      while(var2.hasNext()) {
-         Player player = (Player)var2.next();
+      for (Player player : Bukkit.getOnlinePlayers()) {
          player.sendTitle(title);
       }
 
@@ -109,13 +112,9 @@ public class Islands implements Listener {
       HashSet<UUID> startingPlayers = this.randomBlock.getStartingPlayers();
       alivePlayers.clear();
       startingPlayers.clear();
-      Iterator var3 = Bukkit.getOnlinePlayers().iterator();
 
-      while(var3.hasNext()) {
-         Player player = (Player)var3.next();
+      for (Player player : Bukkit.getOnlinePlayers()) {
          this.bossBar.addPlayer(player);
-         SpectatorPlayer spectatorPlayer = new SpectatorPlayer(player);
-         spectatorPlayer.unsetSpectator(this.randomBlock);
          this.randomBlock.getAlivePlayers().add(player.getUniqueId());
          this.randomBlock.getStartingPlayers().add(player.getUniqueId());
       }
@@ -125,15 +124,12 @@ public class Islands implements Listener {
    }
 
    public void respawnAllPlayers() {
-      Iterator var1 = Bukkit.getOnlinePlayers().iterator();
-
-      while(var1.hasNext()) {
-         Player player = (Player)var1.next();
-         this.spawn(player);
+      for (Player player : Bukkit.getOnlinePlayers()) {
+         spawn(player);
          player.setGameMode(GameMode.SURVIVAL);
          player.getInventory().clear();
+         player.setHealth(20);
       }
-
    }
 
    @EventHandler
@@ -152,7 +148,7 @@ public class Islands implements Listener {
          player.getInventory().clear();
       } else {
          Location location = new Location(this.world.getBukkitWorld(), 0.0D, 60.0D, 0.0D);
-         player.teleportAsync(location);
+         player.teleport(location);
          player.setGameMode(GameMode.SPECTATOR);
       }
 
@@ -185,7 +181,7 @@ public class Islands implements Listener {
             this.gameTimer.cancel();
             Player winnerPlayer;
             if (alivePlayers.size() == 1) {
-               winnerPlayer = Bukkit.getPlayer((UUID)this.randomBlock.getAlivePlayers().get(0));
+               winnerPlayer = Bukkit.getPlayer(this.randomBlock.getAlivePlayers().get(0));
             } else {
                winnerPlayer = e.getEntity();
             }
@@ -206,47 +202,36 @@ public class Islands implements Listener {
       } else {
          Location location = new Location(this.world.getBukkitWorld(), 0.0D, 60.0D, 0.0D);
          player.teleportAsync(location);
-         SpectatorPlayer spectatorPlayer = new SpectatorPlayer(player);
-         spectatorPlayer.setSpectator(this.randomBlock);
+         player.setGameMode(GameMode.SPECTATOR);
       }
-
    }
 
    public void spawn(final Player player) {
-      (new BukkitRunnable() {
+      new BukkitRunnable() {
          public void run() {
-            if (Islands.this.world.getBukkitWorld() == null) {
-               (new BukkitRunnable() {
-                  public void run() {
-                     if (Islands.this.world.getBukkitWorld() != null) {
-                        Islands.this.dangerousSpawn(player);
-                        this.cancel();
-                     }
-
-                  }
-               }).runTaskTimer(Islands.this.randomBlock, 5L, 5L);
-            } else {
-               Islands.this.dangerousSpawn(player);
+            if (world.getBukkitWorld() != null) {
+               dangerousSpawn(player);
+               this.cancel();
             }
 
          }
-      }).runTaskLater(this.randomBlock, 30L);
+      }.runTaskTimer(randomBlock, 30L, 5L);
    }
 
    public void dangerousSpawn(Player player) {
       player.getInventory().clear();
-      int x = this.randomLocation();
-      int z = this.randomLocation();
-      Location location = new Location(this.world.getBukkitWorld(), (double)x, 52.0D, (double)z);
-      Location locationOfBedrock = new Location(this.world.getBukkitWorld(), (double)x, 50.0D, (double)z);
-      this.world.getBukkitWorld().getBlockAt(locationOfBedrock).setType(Material.BEDROCK);
+      Location locationOfBedrock = randomLocation();
+      Location location = new Location(locationOfBedrock.getWorld(), locationOfBedrock.getX(), 82, locationOfBedrock.getZ());
+      world.getBukkitWorld().getBlockAt(locationOfBedrock).setType(Material.BEDROCK);
       player.teleportAsync(location);
    }
 
-   public int randomLocation() {
-      Random random = new Random();
-      int range = (int)Math.ceil(Math.sqrt((double)this.randomBlock.getStartingPlayers().size()) * 24.0D);
-      int rng = random.nextInt(range);
-      return (int)((double)(rng * 2) - Math.ceil(Math.sqrt((double)(this.randomBlock.getStartingPlayers().size() * 24))));
+   public Location randomLocation() {
+      double angle = random.nextDouble() * 2 * Math.PI;
+      double radius = 32 * Math.sqrt(randomBlock.getStartingPlayers().size()) * Math.sqrt(random.nextDouble());
+
+      int x = (int) Math.round(radius * Math.cos(angle));
+      int z = (int) Math.round(radius * Math.sin(angle));
+      return new Location(world.getBukkitWorld(), x, 80, z);
    }
 }

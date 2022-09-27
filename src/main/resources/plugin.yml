@@ -1,4 +1,8 @@
-name: Randomitemevery30
+name: RandomWars
 version: 1.0-SNAPSHOT
 main: me.xemor.randomwars.RandomWars
 api-version: 1.13
+commands:
+  vote:
+    aliases: ["v"]
+    description: "Allows you to vote to increase the chance of certain events"

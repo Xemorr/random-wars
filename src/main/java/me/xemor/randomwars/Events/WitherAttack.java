@@ -17,12 +17,11 @@ public class WitherAttack extends Event {
    }
 
    public void start(World world, me.xemor.randomwars.RandomWars randomWars) {
-      int y = 90;
+      int y = 105;
 
-      for(int i = 0; i < this.amount * randomWars.getStartingPlayers().size(); i++) {
-         int x = randomWars.getIslands().randomLocation();
-         int z = randomWars.getIslands().randomLocation();
-         Location location = new Location(world, x, y, z);
+      for (int i = 0; i < this.amount * randomWars.getStartingPlayers().size(); i++) {
+         Location location = randomWars.getIslands().randomLocation();
+         location.setY(y);
          world.spawn(location, Wither.class);
       }
 

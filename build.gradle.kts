@@ -10,6 +10,7 @@ version = "1.2.1"
 repositories {
     mavenCentral()
     mavenLocal()
+    maven{ url = uri("https://hub.spigotmc.org/nexus/content/repositories/snapshots/") }
     maven { url = uri("https://repo.papermc.io/repository/maven-public/") }
 }
 
@@ -24,7 +25,8 @@ java {
 tasks.shadowJar {
     minimize()
     configurations = listOf(project.configurations.shadow.get())
-    val folder = System.getenv("pluginFolder")
+    var folder = System.getenv("pluginFolder")
+    if (folder == null) folder = "D:\\"
     destinationDirectory.set(file(folder))
 }
 

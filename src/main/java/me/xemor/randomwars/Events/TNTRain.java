@@ -20,23 +20,15 @@ public class TNTRain extends Event {
       int y = 320;
 
       for(int i = 0; i < this.multiplier * randomWars.getStartingPlayers().size(); ++i) {
-         int x = randomWars.getIslands().randomLocation();
-         int z = randomWars.getIslands().randomLocation();
-         TNTPrimed tnt = (TNTPrimed)world.spawn(new Location(world, (double)x, (double)y, (double)z), TNTPrimed.class);
-         tnt.setFuseTicks(300);
+         Location location = randomWars.getIslands().randomLocation();
+         location.setY(y);
+         TNTPrimed tnt = (TNTPrimed)world.spawn(location, TNTPrimed.class);
+         tnt.setFuseTicks(280);
       }
 
    }
-
-   public String getName() {
-      return this.name;
-   }
-
    public boolean playBossMusic() {
       return false;
    }
 
-   public ItemStack getIcon() {
-      return this.icon;
-   }
 }

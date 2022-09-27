@@ -15,12 +15,11 @@ public class PhantomAttack extends Event {
    }
 
    public void start(World world, me.xemor.randomwars.RandomWars randomWars) {
-      int y = 90;
+      int y = 115;
 
       for(int i = 0; i < this.amount; ++i) {
-         int x = randomWars.getIslands().randomLocation();
-         int z = randomWars.getIslands().randomLocation();
-         Location location = new Location(world, x, y, z);
+         Location location = randomWars.getIslands().randomLocation();
+         location.setY(y);
          world.spawn(location, Phantom.class);
          world.setTime(15000L);
       }
